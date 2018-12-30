@@ -63,7 +63,7 @@ static SV *decode_simple_value(MMDB_entry_data_list_s **current)
         return newSViv(entry_data.boolean);
     default:
         croak(
-            "MaxMind::DB::Reader::XS - error decoding unknown type number %i",
+            "MaxMind::DB::Reader::onlyXS - error decoding unknown type number %i",
             entry_data.type
             );
     }
@@ -172,7 +172,7 @@ static void call_data_callback(MMDB_s *mmdb, SV *data_callback,
         const char *error = MMDB_strerror(status);
         MMDB_free_entry_data_list(entry_data_list);
         croak(
-            "MaxMind::DB::Reader::XS - Entry data error looking at offset %i: %s",
+            "MaxMind::DB::Reader::onlyXS - Entry data error looking at offset %i: %s",
             record_entry->offset, error
             );
     }
@@ -210,7 +210,7 @@ static void iterate_search_nodes(MMDB_s *mmdb, SV *data_callback,
     if (MMDB_SUCCESS != status) {
         const char *error = MMDB_strerror(status);
         croak(
-            "MaxMind::DB::Reader::XS - Error reading node: %s",
+            "MaxMind::DB::Reader::onlyXS - Error reading node: %s",
             error
             );
     }
@@ -241,7 +241,7 @@ static void iterate_record_entry(MMDB_s *mmdb, SV *data_callback,
     switch (record_type) {
     case MMDB_RECORD_TYPE_INVALID:
         croak(
-            "MaxMind::DB::Reader::XS - Invalid record when reading node"
+            "MaxMind::DB::Reader::onlyXS - Invalid record when reading node"
             );
     case MMDB_RECORD_TYPE_SEARCH_NODE:
         iterate_search_nodes(mmdb, data_callback, node_callback, record,
@@ -255,21 +255,21 @@ static void iterate_record_entry(MMDB_s *mmdb, SV *data_callback,
                            record_entry);
         return;
     default:
-        croak("MaxMind::DB::Reader::XS - Unknown record type: %u",
+        croak("MaxMind::DB::Reader::onlyXS - Unknown record type: %u",
               record_type);
     }
 }
 
 /* *INDENT-OFF* */
 
-MODULE = MaxMind::DB::Reader::XS    PACKAGE = MaxMind::DB::Reader::XS
+MODULE = MaxMind::DB::Reader::onlyXS    PACKAGE = MaxMind::DB::Reader::onlyXS
 
 BOOT:
      PERL_MATH_INT64_LOAD_OR_CROAK;
      PERL_MATH_INT128_LOAD_OR_CROAK;
 
 MMDB_s *
-_open_mmdb(self, file, flags)
+_open_mmdb(file, flags)
     char *file;
     U32 flags;
     PREINIT:
@@ -278,7 +278,7 @@ _open_mmdb(self, file, flags)
 
     CODE:
         if (file == NULL) {
-            croak("MaxMind::DB::Reader::XS - No file passed to _open_mmdb()\n");
+            croak("MaxMind::DB::Reader::onlyXS - No file passed to _open_mmdb()\n");
         }
         mmdb = (MMDB_s *)malloc(sizeof(MMDB_s));
         status = MMDB_open(file, flags, mmdb);
@@ -287,7 +287,7 @@ _open_mmdb(self, file, flags)
             const char *error = MMDB_strerror(status);
             free(mmdb);
             croak(
-                "MaxMind::DB::Reader::XS - Error opening database file \"%s\": %s",
+                "MaxMind::DB::Reader::onlyXS - Error opening database file \"%s\": %s",
                 file, error
                 );
         }
@@ -297,14 +297,14 @@ _open_mmdb(self, file, flags)
         RETVAL
 
 void
-_close_mmdb(self, mmdb)
+_close_mmdb(mmdb)
         MMDB_s *mmdb;
     CODE:
         MMDB_close(mmdb);
         free(mmdb);
 
 SV *
-_raw_metadata(self, mmdb)
+_raw_metadata(mmdb)
         MMDB_s *mmdb
     PREINIT:
         MMDB_entry_data_list_s *entry_data_list;
@@ -314,7 +314,7 @@ _raw_metadata(self, mmdb)
             const char *error = MMDB_strerror(status);
             MMDB_free_entry_data_list(entry_data_list);
             croak(
-                "MaxMind::DB::Reader::XS - Error getting metadata: %s",
+                "MaxMind::DB::Reader::onlyXS - Error getting metadata: %s",
                 error
                 );
         }
@@ -324,7 +324,7 @@ _raw_metadata(self, mmdb)
         RETVAL
 
 SV *
-__data_for_address(self, mmdb, ip_address)
+__data_for_address(mmdb, ip_address)
         MMDB_s *mmdb
         char *ip_address
     PREINIT:
@@ -346,7 +346,7 @@ __data_for_address(self, mmdb, ip_address)
         if (MMDB_SUCCESS != mmdb_status) {
             const char *mmdb_error = MMDB_strerror(mmdb_status);
             croak(
-                "MaxMind::DB::Reader::XS - Error looking up IP address \"%s\": %s",
+                "MaxMind::DB::Reader::onlyXS - Error looking up IP address \"%s\": %s",
                 ip_address, mmdb_error
                 );
         }
@@ -357,7 +357,7 @@ __data_for_address(self, mmdb, ip_address)
                 const char *get_error = MMDB_strerror(get_status);
                 MMDB_free_entry_data_list(entry_data_list);
                 croak(
-                    "MaxMind::DB::Reader::XS - Entry data error looking up \"%s\": %s",
+                    "MaxMind::DB::Reader::onlyXS - Entry data error looking up \"%s\": %s",
                     ip_address, get_error
                     );
             }
@@ -369,7 +369,7 @@ __data_for_address(self, mmdb, ip_address)
         RETVAL
 
 void
-_iterate_search_tree(self, mmdb, data_callback, node_callback)
+_iterate_search_tree(mmdb, data_callback, node_callback)
         MMDB_s *mmdb
         SV *data_callback;
         SV *node_callback;
@@ -387,7 +387,7 @@ _iterate_search_tree(self, mmdb, data_callback, node_callback)
             ipnum, depth, max_depth);
 
 void
-__read_node(self, mmdb, node_number)
+__read_node(mmdb, node_number)
         MMDB_s *mmdb
         U32 node_number
     PREINIT:
@@ -398,7 +398,7 @@ __read_node(self, mmdb, node_number)
         if (MMDB_SUCCESS != status) {
             const char *error = MMDB_strerror(status);
             croak(
-                "MaxMind::DB::Reader::XS - Error trying to read node %i: %s",
+                "MaxMind::DB::Reader::onlyXS - Error trying to read node %i: %s",
                 node_number, error
                 );
         }

@@ -45,43 +45,18 @@ sub _mb_args {
   },
   "dist_abstract" => "Fast XS implementation of MaxMind DB reader",
   "dist_author" => [
-    "Boris Zentner <bzentner\@maxmind.com>",
-    "Dave Rolsky <drolsky\@maxmind.com>",
-    "Ran Eilam <reilam\@maxmind.com>"
+    "Vladimir Varlamov <bes.internal\@gmail.com>"
   ],
-  "dist_name" => "MaxMind-DB-Reader-XS",
-  "dist_version" => "1.000006",
-  "license" => "artistic_2",
-  "module_name" => "MaxMind::DB::Reader::XS",
+  "dist_name" => "MaxMind-DB-Reader-onlyXS",
+  "dist_version" => "v1.000006",
+  "license" => "perl",
+  "module_name" => "MaxMind::DB::Reader::onlyXS",
   "recursive_test_files" => 1,
   "requires" => {
-    "MaxMind::DB::Metadata" => "0.040001",
-    "MaxMind::DB::Reader::Role::HasMetadata" => 0,
-    "MaxMind::DB::Types" => 0,
-    "Moo" => 0,
     "XSLoader" => 0,
-    "namespace::autoclean" => 0,
     "perl" => "5.010000",
     "strict" => 0,
     "warnings" => 0
-  },
-  "test_requires" => {
-    "ExtUtils::MakeMaker" => 0,
-    "File::Spec" => 0,
-    "Math::Int128" => 0,
-    "MaxMind::DB::Reader" => 0,
-    "Module::Implementation" => 0,
-    "Net::Works::Network" => "0.21",
-    "Path::Class" => "0.27",
-    "Test::Fatal" => 0,
-    "Test::MaxMind::DB::Common::Util" => 0,
-    "Test::More" => "0.96",
-    "Test::Number::Delta" => 0,
-    "Test::Requires" => 0,
-    "autodie" => 0,
-    "lib" => 0,
-    "utf8" => 0,
-    "version" => 0
   }
 );
 

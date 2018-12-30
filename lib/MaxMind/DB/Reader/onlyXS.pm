@@ -1,19 +1,11 @@
-package MaxMind::DB::Reader::XS;
+package MaxMind::DB::Reader::onlyXS;
 
 use strict;
 use warnings;
-use namespace::autoclean;
 
-our $VERSION = '1.000006';
+our $VERSION = 'v1.000006'; # VERSION
 
 use 5.010000;
-
-use MaxMind::DB::Metadata 0.040001;
-use MaxMind::DB::Types qw( Int Str );
-
-use Moo;
-
-with 'MaxMind::DB::Reader::Role::HasMetadata';
 
 use XSLoader;
 
@@ -21,35 +13,9 @@ use XSLoader;
 XSLoader::load( __PACKAGE__, $VERSION );
 ## use critic
 
-has file => (
-    is       => 'ro',
-    isa      => Str,
-    coerce   => sub { "$_[0]" },
-    required => 1,
-);
-
-has _mmdb => (
-    is        => 'ro',
-    init_arg  => undef,
-    lazy      => 1,
-    builder   => '_build_mmdb',
-    predicate => '_has_mmdb',
-);
-
-# XXX - making this private & hard coding this is obviously wrong - eventually
-# we need to expose the flag constants in Perl
-has _flags => (
-    is       => 'ro',
-    isa      => Int,
-    init_arg => undef,
-    default  => 0,
-);
-
-sub BUILD { $_[0]->_mmdb }
-
 ## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
 sub record_for_address {
-    return $_[0]->__data_for_address( $_[0]->_mmdb, $_[1] );
+    return __data_for_address( _open_mmdb($_[0],undef), $_[1] );
 }
 
 sub iterate_search_tree {
@@ -63,26 +29,6 @@ sub iterate_search_tree {
     );
 }
 
-sub _build_mmdb {
-    my $self = shift;
-
-    return $self->_open_mmdb( $self->file, $self->_flags );
-}
-
-sub _build_metadata {
-    my $self = shift;
-
-    my $raw = $self->_raw_metadata( $self->_mmdb );
-
-    my $metadata = MaxMind::DB::Metadata->new($raw);
-
-    return $metadata unless $ENV{MAXMIND_DB_READER_DEBUG};
-
-    $metadata->debug_dump;
-
-    return $metadata;
-}
-
 ## use critic
 
 sub DEMOLISH {
@@ -93,8 +39,6 @@ sub DEMOLISH {
 
     return;
 }
-
-__PACKAGE__->meta->make_immutable;
 
 1;
 
