@@ -3,9 +3,13 @@ package MaxMind::DB::Reader::onlyXS;
 use strict;
 use warnings;
 
-our $VERSION = 'v1.000006'; # VERSION
+our $VERSION = '1.000008';
 
 use 5.010000;
+
+# We depend on these in the C/XS code.
+use Math::Int64  ();
+use Math::Int128 ();
 
 use XSLoader;
 
